@@ -1,0 +1,6 @@
+.idea/
+adc-monitor/.idea/
+adc-monitor/cmake-build-debug/
+web-services/.idea/
+web-services/web-server/node_modules/
+web-services/websocket-gateway/node_modules/

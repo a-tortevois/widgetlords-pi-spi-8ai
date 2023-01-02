@@ -1,0 +1,17 @@
+{
+  "name": "websocket-gateway",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch ./src/index.js",
+    "start": "node ./src/index.js &"
+  },
+  "author": "Alexandre TORTEVOIS <alexandre.tortevois@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "async-limiter": "^2.0.0",
+    "ws": "^8.8.1"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "web-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch ./src/index.js",
+    "start": "node ./src/index.js &"
+  },
+  "author": "Alexandre TORTEVOIS <alexandre.tortevois@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^4.10.2",
+    "@fastify/static": "^6.6.0"
+  }
+}

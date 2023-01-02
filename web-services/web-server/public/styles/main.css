@@ -1,0 +1,87 @@
+/* --------------------------------------------------------
+ *   Color
+ * -------------------------------------------------------- */
+:root {
+    --text: #646464;
+    --bg-def: #ffffff;
+    --border-light-grey: #bfbdbd;
+    --min-height: 14px;
+
+    --red: #ff0000;
+    --green: #80ff00;
+}
+
+/* --------------------------------------------------------
+ *   Common
+ * -------------------------------------------------------- */
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body, table, label {
+    font-family: Verdana, sans-serif;
+    font-size: 11.5px;
+    color: var(--text);
+}
+
+#container {
+    margin: 10px;
+}
+
+/* --------------------------------------------------------
+ *   WebSocket Status
+ * -------------------------------------------------------- */
+
+span.led {
+    margin: 0 auto -1px auto;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+span.led-red {
+    background-color: var(--red);
+}
+
+span.led-green {
+    background-color: var(--green);
+}
+
+/* --------------------------------------------------------
+ *   Table Variables
+ * -------------------------------------------------------- */
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.cell {
+    border: 1px solid var(--border-light-grey);
+    margin-top: 5px; /* -1px */
+    margin-left: -1px;
+    padding: 2px 5px;
+}
+
+.cell span {
+    width: 100%;
+    float: left;
+    clear: left;
+    text-align: center;
+}
+
+.cell span.th {
+    font-weight: bold;
+}
+
+.cell span.td {
+    /* float: right; */
+}
+
+.versions {
+    margin-top: 10px;
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ADC Monitor - Read</title>
+    <link href="styles/main.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="container"></div>
+<div id="context_data" style="display: none"></div>
+<script src="scripts/context.js"></script>
+<script src="scripts/functions.js"></script>
+<script src="scripts/websocket-client.js"></script>
+<script>
+    function getCells(item) {
+        let html = ``;
+        const data = {
+            title: "",
+            id: "",
+            value: "",
+        }
+        for (let i in contextData[item]) {
+            if (contextData[item].hasOwnProperty(i)) {
+                i = parseInt(i);
+                switch (item) {
+                    case "adc":
+                        data.title = ADC[i].name;
+                        data.id = ADC[i].name;
+                        data.value = contextData.adc[i];
+                        break;
+                    default:
+                }
+                html += `<div class="cell"><span class="th">${data.title}</span><span class="td" id="${data.id}">${data.value}</span></div>`;
+            }
+        }
+        return html;
+    }
+
+    function updateHtmlCallback(key, id, value) {
+        // nothing to do
+    }
+
+    function renderHtml(resolve) {
+        let html = ``;
+        html += getMenu();
+        html += `<h1>ADC values</h1>`;
+        html += `<div class="flex-row">`;
+        html += getCells("adc");
+        html += `</div>`;
+        html += `<div class="versions">`;
+        html += `<div>Software version: ${getSwVersion()}</div>`;
+        html += `<div>Webserver: ${getWsVersion()}</div>`;
+        html += `</div>`;
+        document.getElementById("container").innerHTML = html;
+        resolve();
+    }
+</script>
+</body>
+</html>
