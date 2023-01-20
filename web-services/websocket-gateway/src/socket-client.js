@@ -9,7 +9,7 @@ class SocketClient extends EventEmitter {
     constructor(options) {
         super();
         this.name = options.hasOwnProperty('name') ? `SocketClient ${options.name}` : 'SocketClient';
-        this.host = options.hasOwnProperty('host') ? options.hostname : 'localhost';
+        this.host = options.hasOwnProperty('host') ? options.hostname : '127.0.0.1';
         this.port = options.hasOwnProperty('port') ? options.port : null;
         this.onData = options.hasOwnProperty('onData') ? options.onData : null;
         this.socket = new Socket();
