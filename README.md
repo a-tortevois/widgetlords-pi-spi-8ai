@@ -132,3 +132,16 @@ $ systemctl start adc_monitor_websocket_gateway.service
 $ systemctl start adc_monitor_web_server.service
 $ systemctl list-units --type=service | grep adc_monitor
 ```
+
+## Software update
+
+Run the following commands:
+
+```
+$ cd widgetlords-pi-spi-8ai
+$ git fetch --all
+$ git reset --hard
+$ git pull --all
+$ systemctl stop adc_monitor*
+$ ./run.sh --install
+```

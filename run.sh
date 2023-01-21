@@ -11,7 +11,31 @@ exit_error() {
   exit 1
 }
 
+install_libwidgetlords() {
+  if [ "$(ldconfig -p | grep -c "libwidgetlords")" -eq 0 ]; then
+    wget https://github.com/widgetlords/libwidgetlords/releases/download/v2.1.1/libwidgetlords_2.1.1_arm64.deb
+    sudo dpkg -i libwidgetlords_2.1.1_arm64.deb
+  fi
+}
+
+update_config_txt() {
+  update=0
+  if [ "$(grep -c "dtparam=spi=on" /boot/config.txt)" -ne 1 ]; then
+    echo "dtparam=spi=on" >>/boot/config.txt
+    update=1
+  fi
+  if [ "$(grep -c "dtoverlay=pi-spi" /boot/config.txt)" -ne 1 ]; then
+    echo "dtoverlay=pi-spi" >>/boot/config.txt
+    update=1
+  fi
+  if [ "${update}" -eq 1 ]; then
+    echo "Please reboot at the end of the installation process"
+  fi
+}
+
 install() {
+  install_libwidgetlords
+  update_config_txt
   chmod +x ./adc-monitor/run.sh
   ./adc-monitor/run.sh --build-release
   chmod +x ./web-services/run.sh
