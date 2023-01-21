@@ -11,7 +11,7 @@
 #define ADC_MCP3008_FIFO_MAX_SIZE                                       16 // value smoothing (resolution)
 #define ADC_MCP3008_DEAD_BAND                                           10
 #define ADC_MCP3008_MIN_VALUE                                            0
-#define ADC_MCP3008_MAX_VALUE                                         1000
+#define ADC_MCP3008_MAX_VALUE                                         1023
 
 typedef enum {
     ADC_MCP3008_SPIDEV_0,

@@ -73,23 +73,50 @@ $ sudo raspi-config
 
 Then, select `Interface Options` > `SPI` > `Yes`
 
-2. Edit the `/boot/config.txt` file add to dtoverlay (for each boards):
+2. Install the `libwidgetlords` package
+
+```bash
+$ wget https://github.com/widgetlords/libwidgetlords/releases/download/v2.1.1/libwidgetlords_2.1.1_arm64.deb
+$ sudo dpkg -i libwidgetlords_2.1.1_arm64.deb
+```
+
+**NOTE:** If you have previously installed the library you must remove it first using
+
+```bash
+$ sudo apt remove libwidgetlords
+```
+
+For more information, see https://widgetlords.com/pages/getting-started-with-pi-spi-libraries
+
+3. Edit the `/boot/config.txt` file add to dtoverlay:
 
 ```
-dtoverlay=mcp3008,spi0-0-present
+dtoverlay=pi-spi
 ```
 
 Then `reboot` your Raspberry
 
-3. Check if the SPI devices are properly mounted with the command:
-
-```bash
-$ dmesg | grep mcp
-```
+4. Check if the SPI devices are properly mounted with the command:
 
 ```bash
 $ ls /dev | grep spidev
 ```
+
+5. Address the chips
+
+The four chip selects are shown here:
+
+![Chip Select](chip-select.png)
+
+Only 1 jumper should be installed at a time.  
+Typically, the jumpers are installed as follows:
+
+| Jumper | Module |   Interface    |               Address                | JSON index |
+|:------:|:------:|:--------------:|:------------------------------------:|:----------:|
+|  CE1   |   1    | /dev/spidev0.1 | ADC_DEV_0_CHAN_0 .. ADC_DEV_0_CHAN_7 |   0 .. 7   |
+|   22   |   2    | /dev/spidev0.4 | ADC_DEV_1_CHAN_0 .. ADC_DEV_1_CHAN_7 |  8 .. 15   |
+|   27   |   3    | /dev/spidev0.5 | ADC_DEV_2_CHAN_0 .. ADC_DEV_2_CHAN_7 |  16 .. 23  |
+|   18   |   4    | /dev/spidev0.6 | ADC_DEV_3_CHAN_0 .. ADC_DEV_3_CHAN_7 |  24 .. 31  |
 
 ## Software installation
 

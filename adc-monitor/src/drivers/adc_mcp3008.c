@@ -22,14 +22,14 @@ static uint8_t ADC_MCP3008_SPI_MODE = SPI_MODE_0;
 static uint8_t ADC_MCP3008_SPI_BITS_PER_WORD = 8;
 static uint32_t ADC_MCP3008_SPI_MAX_SPEED_HZ = 1000000;
 static const char *sysfs_paths[ADC_MCP3008_SPIDEVICES_COUNT] = {
-    // ADC_MCP3008_SPIDEV_0
-    "/dev/spidev0.0",
-    // ADC_MCP3008_SPIDEV_1
+    // ADC_MCP3008_SPIDEV_0 (Jumper on CE1)
     "/dev/spidev0.1",
-    // ADC_MCP3008_SPIDEV_2
-    "/dev/spidev0.2",
-    // ADC_MCP3008_SPIDEV_3
-    "/dev/spidev0.3",
+    // ADC_MCP3008_SPIDEV_1 (Jumper on 22)
+    "/dev/spidev0.4",
+    // ADC_MCP3008_SPIDEV_2 (Jumper on 27)
+    "/dev/spidev0.5",
+    // ADC_MCP3008_SPIDEV_3 (Jumper on 18)
+    "/dev/spidev0.6",
 };
 static int fd[ADC_MCP3008_SPIDEVICES_COUNT] = {-1, -1, -1, -1};
 static adc_mcp3008_t ADC_MCP3008[ADC_INPUTS_COUNT] = {
@@ -307,6 +307,16 @@ int adc_mcp3008_init(void) {
         log_fatal("Unable to initialize mutex: %s", strerror(errno));
         exit(EXIT_FAILURE);
     }
+
+    // Wait for HW to be mounted
+    log_info("Wait for HW to be mounted");
+    for (adc_mcp3008_spidev_id id = 0; id < ADC_MCP3008_SPIDEVICES_COUNT; id++) {
+        struct stat file_stat;
+        while (stat(sysfs_paths[id], &file_stat) < 0) {
+            sleep(5);
+        }
+    }
+    log_info("HW is ready");
 
     // Initialize file descriptors
     for (adc_mcp3008_spidev_id id = 0; id < ADC_MCP3008_SPIDEVICES_COUNT; id++) {
