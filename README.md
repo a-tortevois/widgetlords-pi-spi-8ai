@@ -143,5 +143,6 @@ $ git fetch --all
 $ git reset --hard
 $ git pull --all
 $ systemctl stop adc_monitor*
+$ chmod +x run.sh
 $ ./run.sh --install
 ```

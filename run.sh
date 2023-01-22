@@ -48,6 +48,19 @@ install() {
 }
 
 uninstall() {
+  # Stop services
+  if [ "$(systemctl list-units --type=service --state=active | grep -c adc_monitor)" -ne 0 ]; then
+    systemctl stop adc_monitor*
+  fi
+  # Uninstall libwidgetlords
+  if [ "$(ldconfig -p | grep -c "libwidgetlords")" -ne 0 ]; then
+    sudo apt remove libwidgetlords
+  fi
+  # Remove pi-spi overlay from config.txt
+  if [ "$(grep -c "dtoverlay=pi-spi" /boot/config.txt)" -ne 0 ]; then
+    sed -i '/dtoverlay=pi-spi:extra_cs=true/d' /boot/config.txt
+  fi
+  # Uninstall services
   ./adc-monitor/run.sh --uninstall
   ./web-services/run.sh --uninstall
 }
