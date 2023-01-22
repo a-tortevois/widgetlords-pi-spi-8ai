@@ -13,8 +13,13 @@ exit_error() {
 
 install_libwidgetlords() {
   if [ "$(ldconfig -p | grep -c "libwidgetlords")" -eq 0 ]; then
-    wget https://github.com/widgetlords/libwidgetlords/releases/download/v2.1.1/libwidgetlords_2.1.1_arm64.deb
-    sudo dpkg -i libwidgetlords_2.1.1_arm64.deb
+    if [ "$(getconf LONG_BIT)" -eq 64 ]; then
+      wget https://github.com/widgetlords/libwidgetlords/releases/download/v2.1.1/libwidgetlords_2.1.1_arm64.deb
+      sudo dpkg -i libwidgetlords_2.1.1_arm64.deb
+    else
+      wget https://github.com/widgetlords/libwidgetlords/releases/download/v2.1.1/libwidgetlords_2.1.1_armhf.deb
+      sudo dpkg -i libwidgetlords_2.1.1_armhf.deb
+    fi
   fi
 }
 
@@ -25,7 +30,7 @@ update_config_txt() {
     update=1
   fi
   if [ "$(grep -c "dtoverlay=pi-spi" /boot/config.txt)" -ne 1 ]; then
-    echo "dtoverlay=pi-spi" >>/boot/config.txt
+    echo "dtoverlay=pi-spi:extra_cs=true" >>/boot/config.txt
     update=1
   fi
   if [ "${update}" -eq 1 ]; then

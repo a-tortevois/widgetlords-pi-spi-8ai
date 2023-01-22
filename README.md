@@ -91,7 +91,7 @@ For more information, see https://widgetlords.com/pages/getting-started-with-pi-
 3. Edit the `/boot/config.txt` file add to dtoverlay:
 
 ```
-dtoverlay=pi-spi
+dtoverlay=pi-spi:extra_cs=true
 ```
 
 Then `reboot` your Raspberry
