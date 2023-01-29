@@ -136,13 +136,15 @@ const loadContextData = () => {
         ws_version: '1.0.0',
     };
 
-    for (let i in ADC) {
-        if (ADC.hasOwnProperty(i)) {
-            contextData.adc[i] = 0;
-        }
+    for (let i = 0; i < ADC.length; i++) {
+        contextData.adc[i] = 0;
     }
 
     return contextData;
+}
+
+const getIndexFromAdcName = (adcName) => {
+    return ADC.findIndex(element => element.name === adcName);
 }
 
 const contextData = loadContextData();

@@ -12,6 +12,12 @@
 <script src="scripts/functions.js"></script>
 <script src="scripts/websocket-client.js"></script>
 <script>
+    const CONTACT_CLOSURE_THRESHOLD = 550;
+
+    function contactIsClosed(value) {
+        return value <= CONTACT_CLOSURE_THRESHOLD;
+    }
+
     function getCells(item) {
         let html = ``;
         const data = {
@@ -37,7 +43,17 @@
     }
 
     function updateHtmlCallback(key, id, value) {
-        // nothing to do
+        // This callback is automatically executed when a value change is received on the WebSocket (see in websocket-client.js:_updateContextData)
+        // Note: the `key` is always `adc` in this application
+
+        // Below is a use case
+        // if (index === getIndexFromAdcName('ADC_DEV_0_CHAN_0')) {
+        //     if (contactIsClosed(value)) {
+        //         document.getElementById('myElement').style.display = 'none';
+        //     } else {
+        //         document.getElementById('myElement').style.display = 'block';
+        //     }
+        // }
     }
 
     function renderHtml(resolve) {
@@ -52,7 +68,7 @@
         html += `<div>Webserver: ${getWsVersion()}</div>`;
         html += `</div>`;
         document.getElementById("container").innerHTML = html;
-        resolve();
+        resolve(); // this raises the `DOMContentLoaded` event and will then trigger the `AppIsReady` event
     }
 </script>
 </body>
