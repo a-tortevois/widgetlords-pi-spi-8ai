@@ -19,7 +19,7 @@ static int gpio_fd = -1;
 static const char gpio_adapter[] = "/dev/gpiochip0";
 
 static const char *L_IO_STATE[IO_STATE_COUNT] = {"Open", "Close"};
-static const char *L_IO_EVENT[IO_EVENT_COUNT] = {"IO_EVENT_NONE", "IO_EVENT_RISING_EDGE", "IO_EVENT_FALLING_EDGE"};
+// static const char *L_IO_EVENT[IO_EVENT_COUNT] = {"IO_EVENT_NONE", "IO_EVENT_RISING_EDGE", "IO_EVENT_FALLING_EDGE"};
 
 static gpio_struc GPIO[IO_COUNT] = {
     // O_KA1
