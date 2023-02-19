@@ -107,11 +107,14 @@ The field `payload` takes an object with the `i` and `v` fields, which are two a
 - Array `i` contains all the variables indexes
 - Array `v` contains all the variables values
 
-For io, for the moment, only 2 outputs are driven (see the mapping in `adc-monitor/src/drivers/gpio.c`):  
-- `GPIO23` as `O_KA1` with the index `0`
-- `GPIO24` as `O_KA2` with the index `1`  
-
 Once connected, the TCP socket API server automatically sends all (but only) updated inputs. Then, you have to associate the indexes with the values contained in the two arrays.
+
+For `io`, for the moment, only 2 outputs are driven (see the mapping in `adc-monitor/src/drivers/gpio.c`):  
+
+- `GPIO23` as `O_KA1` with the index `0`
+- `GPIO24` as `O_KA2` with the index `1`
+
+![gpio_mapping.png](gpio_mapping.png)
 
 ## RPi hardware configuration (for MCP3008)
 
@@ -188,7 +191,7 @@ $ systemctl list-units --type=service | grep adc_monitor
 Run the following commands:
 
 ```
-$ cd widgetlords-pi-spi-8ai
+$ cd widgetlords-pi-spi-8air
 $ git fetch --all
 $ git reset --hard
 $ git pull --all
