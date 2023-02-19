@@ -11,6 +11,7 @@
 #include "config.h"
 #include "tasks/mainloop.h"
 #include "drivers/adc_mcp3008.h"
+#include "drivers/gpio.h"
 #include "utils/log.h"
 #include "utils/sched_attr.h"
 
@@ -23,7 +24,10 @@ static pthread_t thread_id = -1;
 // -- Private functions ---------------------------------------------------------------------
 
 static int mainloop_init() {
-    return adc_mcp3008_init();
+    int rc = 0;
+    rc = gpio_init();
+    rc = adc_mcp3008_init();
+    return rc;
 }
 
 static void mainloop_exec() {
@@ -34,7 +38,10 @@ static void mainloop_exec() {
 }
 
 static int mainloop_clean() {
-    return adc_mcp3008_clean();
+    int rc = 0;
+    rc = gpio_clean();
+    rc = adc_mcp3008_clean();
+    return rc;
 }
 
 static void *mainloop_thread(void __attribute__((unused)) *p) {

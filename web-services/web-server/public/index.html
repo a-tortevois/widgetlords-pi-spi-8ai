@@ -34,12 +34,80 @@
                         data.id = ADC[i].name;
                         data.value = contextData.adc[i];
                         break;
+                    case "io": {
+                        data.title = IO[i].name;
+                        data.id = IO[i].name;
+                        data.value = contextData.io[i];
+                        break;
+                    }
                     default:
                 }
                 html += `<div class="cell"><span class="th">${data.title}</span><span class="td" id="${data.id}">${data.value}</span></div>`;
             }
         }
         return html;
+    }
+
+    function sendSetOutMessage() {
+        let msg = {
+            topic: "set/out",
+            payload: {
+                i: [],
+                v: [],
+            }
+        }
+
+        for (let i in IO) {
+            if (IO.hasOwnProperty(i)) {
+                if (isElementExists(IO[i].name)) {
+                    let v = parseInt(document.getElementById(IO[i].name).value);
+                    if (v !== contextData.io[i] && v >= IO[i].min_value && v <= IO[i].max_value) {
+                        msg.payload.i.push(parseInt(i));
+                        msg.payload.v.push(v);
+                    }
+                }
+            }
+        }
+
+        if (msg.payload.i.length > 0) {
+            ws.send(msg);
+        }
+    }
+
+    function getForm() {
+        let html = ``;
+        for (let i in IO) {
+            if (IO.hasOwnProperty(i)) {
+                i = parseInt(i);
+                html += `<div class="settings-input">`;
+                html += `<label>${IO[i].name}:</label>`;
+                html += `<input type="${IO[i].type}" id="${IO[i].name}" name="${IO[i].name}" min="${IO[i].min_value}" max="${IO[i].max_value}" value="${contextData.io[i]}" class="" />`;
+                if (IO[i].type === "range") {
+                    html += `<span class="value">value: <span id="${IO[i].name}_value">${contextData.io[i]}</span></span>`;
+                }
+                html += `<span class="range">[range: ${IO[i].min_value} - ${IO[i].max_value}]</span>`;
+                html += `</div>`;
+            }
+        }
+        html += `<button onclick="sendSetOutMessage();">Save</button>`;
+        return html;
+    }
+
+
+    function setListeners() {
+        for (let i in IO) {
+            if (IO.hasOwnProperty(i)) {
+                if (IO[i].type === "range") {
+                    let element = document.getElementById(IO[i].name);
+                    if (element !== null) {
+                        element.onchange = () => {
+                            // console.log(`onChange: ${IO[i].name}, value:${element.value}`);
+                            setElementValue(`${IO[i].name}_value`, element.value);
+                        };
+                    }
+                }
+            }
+        }
     }
 
     function updateHtmlCallback(key, id, value) {
@@ -63,11 +131,19 @@
         html += `<div class="flex-row">`;
         html += getCells("adc");
         html += `</div>`;
+        html += `<h1>Outputs (KA)</h1>`;
+        // html += `<div class="flex-row">`;
+        // html += getCells("io");
+        // html += `</div>`;
+        html += `<div>`;
+        html += getForm();
+        html += `</div>`;
         html += `<div class="versions">`;
         html += `<div>Software version: ${getSwVersion()}</div>`;
         html += `<div>Webserver: ${getWsVersion()}</div>`;
         html += `</div>`;
         document.getElementById("container").innerHTML = html;
+        setListeners();
         resolve(); // this raises the `DOMContentLoaded` event and will then trigger the `AppIsReady` event
     }
 </script>

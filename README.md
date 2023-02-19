@@ -18,7 +18,9 @@ This stack is composed with :
 - A lightweight Web Server, with only one page to expose the HTML/Javascript and WebSocket Client interface.
 
 The TCP socket API server accepts only one client: the `WebSocket Gateway` which more easily provides multi-client mode.  
-The API provide only one method, `get/all` to get all values.
+The API provide only two methods:
+  
+- `get/all` to get all values:  
 
 <table>
 <tr>
@@ -48,7 +50,51 @@ Response
             "i": [&lt;index>],
             "v": [&lt;value>]
         },
+        "io": {
+            "i": [&lt;index>],
+            "v": [&lt;value>]
+        },
         "sw_version": "&lt;version>"
+    }
+}
+</pre>
+</td>
+</tr>
+</table>
+
+- `set/out` to enable an output:  
+
+<table>
+<tr>
+<th>
+Query
+</th>
+<th>
+Response
+</th>
+</tr>
+<tr>
+<td valign="top">
+<pre lang="json">
+{
+    "topic": "set/out",
+    "payload": {
+        "i": [&lt;index>],
+        "v": [&lt;value>]
+    }
+}
+</pre>
+</td>
+<td valign="top">
+<pre lang="json">
+{
+    "status": 201,
+    "timestamp": &lt;timestamp>
+    "payload": {
+        "io": {
+            "i": [&lt;index>],
+            "v": [&lt;value>]
+        },
     }
 }
 </pre>
@@ -60,6 +106,10 @@ The field `payload` takes an object with the `i` and `v` fields, which are two a
 
 - Array `i` contains all the variables indexes
 - Array `v` contains all the variables values
+
+For io, for the moment, only 2 outputs are driven (see the mapping in `adc-monitor/src/drivers/gpio.c`):  
+- `GPIO23` as `O_KA1` with the index `0`
+- `GPIO24` as `O_KA2` with the index `1`  
 
 Once connected, the TCP socket API server automatically sends all (but only) updated inputs. Then, you have to associate the indexes with the values contained in the two arrays.
 

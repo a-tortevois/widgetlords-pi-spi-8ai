@@ -128,16 +128,39 @@ const ADC = [
         name: 'ADC_DEV_3_CHAN_7',
     },
 ];
+
+const IO = [
+    // O_KA1
+    {
+        name: 'O_KA1',
+        type: 'range',
+        min_value: 0,
+        max_value: 1,
+    },
+    // O_KA2
+    {
+        name: 'O_KA2',
+        type: 'range',
+        min_value: 0,
+        max_value: 1,
+    },
+];
+
 const loadContextData = () => {
     const contextData = {
         adc: {},
+        io: {},
         timestamp: 0,
         sw_version: '',
-        ws_version: '1.0.0',
+        ws_version: '1.1.0',
     };
 
     for (let i = 0; i < ADC.length; i++) {
         contextData.adc[i] = 0;
+    }
+
+    for (let i = 0; i < IO.length; i++) {
+        contextData.io[i] = 0;
     }
 
     return contextData;

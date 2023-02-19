@@ -5,6 +5,7 @@
     --text: #646464;
     --bg-def: #ffffff;
     --border-light-grey: #bfbdbd;
+    --border-light-blue: #3c80c0;
     --min-height: 14px;
 
     --red: #ff0000;
@@ -84,4 +85,46 @@ span.led-green {
 
 .versions {
     margin-top: 10px;
+}
+
+/* --------------------------------------------------------
+ *   Table Outputs
+ * -------------------------------------------------------- */
+
+button {
+    /*width: 60px;*/
+    height: 24px;
+    padding: 5px 16px;
+    border: 1px solid var(--border-light-grey);
+    border-radius: 6px;
+    background-color: var(--bg-def);
+    color: var(--text);
+    line-height: 12px
+}
+
+button:hover, button:focus {
+    border: 1px solid var(--border-light-blue);
+}
+
+.settings-input {
+    margin: 0 0 10px 0;
+}
+
+.settings-input label, .settings-input input {
+    vertical-align: middle;
+    margin: 0;
+}
+
+.settings-input label {
+    font-weight: bold;
+    padding: 0 10px 0 0;
+}
+
+.settings-input span.value {
+    padding: 0 0 0 10px;
+}
+
+.settings-input span.range {
+    padding: 0 0 0 10px;
+    font-size: 10.5px;
 }

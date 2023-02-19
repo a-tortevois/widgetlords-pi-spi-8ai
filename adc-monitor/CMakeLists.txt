@@ -25,9 +25,9 @@ set(GENERATE_SRCS ${PROJECT_SOURCE_DIR}/src/utils/build_number.c)
 set(GENERATE_OUTPUT ${PROJECT_BINARY_DIR}/build_number.o)
 set(VERSION_OUTPUT ${PROJECT_BINARY_DIR}/build_number.h)
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 0)
+set(VERSION_MINOR 1)
 set(VERSION_PATCH 0)
-set(VERSION_META "beta") # beta/rc
+set(VERSION_META "") # beta/rc
 
 # Create command to compile the generate command
 add_custom_command(
@@ -54,6 +54,7 @@ add_custom_target(build_number
 add_executable(adc_monitor main.c
         inc/config.h
         inc/drivers/adc_mcp3008.h
+        inc/drivers/gpio.h
         inc/tasks/api.h
         inc/tasks/mainloop.h
         inc/utils/libjson.h
@@ -66,6 +67,7 @@ add_executable(adc_monitor main.c
         src/utils/libjson.c
         src/utils/log.c
         src/utils/stdfun.c
+        src/drivers/gpio.c
         )
 
 # Add libraries

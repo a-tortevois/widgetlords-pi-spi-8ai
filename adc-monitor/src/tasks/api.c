@@ -18,6 +18,7 @@
 #include "config.h"
 #include "tasks/api.h"
 #include "drivers/adc_mcp3008.h"
+#include "drivers/gpio.h"
 #include "utils/libjson.h"
 #include "utils/log.h"
 
@@ -146,66 +147,20 @@ static api_status STATUS[API_STATUS_CODE_COUNT] = {
         .code = 418,
         .text = "Bad request: `param.v[%d]` not found.",
     },
-    // API_ERR_VAR_NOT_FOUND
+    // API_ERR_GPIO_ID_UNDEFINED
     {
         .code = 419,
-        .text = "Bad request: `var:%d` not found.",
+        .text = "Bad request: unable to set the value for `io:%d`, id is undefined.",
     },
-    // API_ERR_VAR_READ_ONLY
+    // API_ERR_GPIO_VALUE_OUT_OF_RANGE
     {
         .code = 420,
-        .text = "Bad request: var is read-only; unable to set `var:%d` with `val:%d`.",
-    },
-    // API_ERR_VAR_ID_UNDEFINED
-    {
-        .code = 421,
-        .text = "Bad request: unable to set the value for `var:%d`, id is undefined.",
-    },
-    // API_ERR_VALUE_OUT_OF_RANGE
-    {
-        .code = 422,
         .text = "Bad request: value is out of range; unable to set `var:%d` with `val:%d`.",
     },
-    // API_ERR_TIMEZONE_UPDATE
+    // API_ERR_GPIO_UNABLE_TO_SET_VALUE
     {
-        .code = 423,
-        .text = "Bad request: unable to update the timezone with `metazone:%d` and `location:%d`.",
-    },
-    // API_ERR_CERAMIC_REG_COMPILE_FAIL
-    {
-        .code = 424,
-        .text = "Bad request: unable to compile the regex.",
-    },
-    // API_ERR_CERAMIC_REG_NOMATCH
-    {
-        .code = 425,
-        .text = "Bad request: regex no match.",
-    },
-    // API_ERR_CERAMIC_REG_FAILED
-    {
-        .code = 426,
-        .text = "Bad request: regex failed: %s.",
-    },
-    // API_ERR_CERAMIC_ID_OUT_OF_RANGE
-    {
-        .code = 427,
-        .text = "Bad request: ceramic_id #%d is out of range.",
-    },
-    // API_ERR_CERAMIC_VAR_ID_OUT_OF_RANGE
-    {
-        .code = 428,
-        .text = "Bad request: var_id #%d is out of range.",
-    },
-    //API_ERR_CERAMIC_VAR_ID_IS_READONLY
-    {
-        .code = 429,
-        .text = "Bad request: CERAMIC.VAR[%s] is readonly.",
-    },
-
-    // API_ERR_CERAMIC_VALUE_OUT_OF_RANGE
-    {
-        .code = 430,
-        .text = "Bad request: CERAMIC.VAR[%s] value %d is out of range.",
+        .code = 421,
+        .text = "Bad request: %s.",
     },
 };
 
@@ -262,9 +217,16 @@ static int add_to_payload(char **payload, const char *key, int count, bool with_
     return rc;
 }
 
-static int build_payload(char **payload, bool with_adc, bool with_all_adc, bool with_sw_version) {
+static int build_payload(char **payload, bool with_io, bool with_all_io, bool with_adc, bool with_all_adc, bool with_sw_version) {
     int rc = 0;
     char *ptr = *payload;
+
+    // Add IO to the payload
+    if (with_io) {
+        if ((rc = add_to_payload(payload, "io", IO_COUNT, with_all_io, (bool (*)(int)) &gpio_is_updated, (int (*)(int)) gpio_get_value, (void (*)(int, bool)) gpio_set_is_updated)) < 0) {
+            goto __error;
+        }
+    }
 
     // Add ADC to the payload
     if (with_adc) {
@@ -330,7 +292,7 @@ static void build_timeout_reply(void) {
     char msg_id[API_MSG_ID_LEN];
     generate_message_id(msg_id, sizeof(msg_id));
     ptr += sprintf(ptr, "{\"_msgid\":\"%s\",\"status\":%d,\"timestamp\":%d,\"payload\":{", msg_id, STATUS[API_SUCCESS].code, (int) time(NULL));
-    if (build_payload(&ptr, true, false, false) < 0) {
+    if (build_payload(&ptr, true, false, true, false, false) < 0) {
         build_error_reply(msg_id, API_ERR_BUFFER_REPLY_OVERFLOW);
         return;
     }
@@ -344,7 +306,7 @@ static void build_get_all_reply(char *msg_id) {
     memset(reply_buffer, 0, sizeof(reply_buffer));
     char *ptr = reply_buffer;
     ptr += sprintf(ptr, "{\"_msgid\":\"%s\",\"status\":%d,\"timestamp\":%d,\"payload\":{", msg_id, STATUS[API_SUCCESS].code, (int) time(NULL));
-    if (build_payload(&ptr, true, true, true) < 0) {
+    if (build_payload(&ptr, true, true, true, true, true) < 0) {
         build_error_reply(msg_id, API_ERR_BUFFER_REPLY_OVERFLOW);
         return;
     }
@@ -354,7 +316,20 @@ static void build_get_all_reply(char *msg_id) {
     // }
 }
 
-/* Unused
+static void build_set_out_reply(char *msg_id) {
+    memset(reply_buffer, 0, sizeof(reply_buffer));
+    char *ptr = reply_buffer;
+    ptr += sprintf(ptr, "{\"_msgid\":\"%s\",\"status\":%d,\"timestamp\":%d,\"payload\":{", msg_id, STATUS[API_SUCCESS_UPDATE].code, (int) time(NULL));
+    if (build_payload(&ptr, true, false, false, false, false) < 0) {
+        build_error_reply(msg_id, API_ERR_BUFFER_REPLY_OVERFLOW);
+        return;
+    }
+    // Ensure we don't have a buffer overflow
+    // if ((ptr - reply_buffer + 2) < MAX_BUFFER_SIZE) {
+    sprintf(ptr, "}}");
+    // }
+}
+
 static int check_indexes_values_array(char *msg_id, json_object *jobj_payload, json_object **jobj_arr_i, json_object **jobj_arr_v) {
     int arr_i_len, arr_v_len;
 
@@ -395,12 +370,113 @@ static int check_indexes_values_array(char *msg_id, json_object *jobj_payload, j
 
     return arr_i_len;
 }
-*/
+
+static void exec_set_out(char *msg_id, json_object *jobj_payload) {
+    int arr_len, id, value;
+    json_object *jobj_arr_i = NULL;
+    json_object *jobj_arr_v = NULL;
+    json_object *jobj_i = NULL;
+    json_object *jobj_v = NULL;
+
+    if ((arr_len = check_indexes_values_array(msg_id, jobj_payload, &jobj_arr_i, &jobj_arr_v)) < 0) {
+        return;
+    }
+
+    jobj_i = json_getFirst(jobj_arr_i);
+    jobj_v = json_getFirst(jobj_arr_v);
+
+    if (jobj_i == NULL) {
+        build_error_reply(msg_id, API_ERR_INDEX_NOT_FOUND, 0);
+        return;
+    }
+
+    if (jobj_v == NULL) {
+        build_error_reply(msg_id, API_ERR_VALUE_NOT_FOUND, 0);
+        return;
+    }
+
+    do {
+        if (json_getInteger(jobj_i, &id) < 0) {
+            build_error_reply(msg_id, API_ERR_INDEX_NAN, jobj_i->value);
+            continue;
+        }
+
+        if (json_getInteger(jobj_v, &value) < 0) {
+            build_error_reply(msg_id, API_ERR_VALUE_NAN, jobj_v->value);
+            continue;
+        }
+
+        if (gpio_id_is_available(id) < 0) {
+            build_error_reply(msg_id, API_ERR_GPIO_ID_UNDEFINED, id);
+            return;
+        }
+
+        switch (id) {
+            case O_KA1: {
+                switch (value) {
+                    case 0: {
+                        if (gpio_write(O_KA1, IO_OPEN) < 0) {
+                            return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to open O_KA1");
+                        }
+                        break;
+                    }
+                    case 1: {
+                        if (gpio_write(O_KA1, IO_CLOSE) < 0) {
+                            return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to close O_KA1");
+                        }
+                        break;
+                    }
+                    default: {
+                        return build_error_reply(msg_id, API_ERR_GPIO_VALUE_OUT_OF_RANGE, "Unknown value to set O_KA1");
+                    }
+                }
+                break;
+            }
+            case O_KA2: {
+                switch (value) {
+                    case 0: {
+                        if (gpio_write(O_KA2, IO_OPEN) < 0) {
+                            return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to open O_KA2");
+                        }
+                        break;
+                    }
+                    case 1: {
+                        if (gpio_write(O_KA2, IO_CLOSE) < 0) {
+                            return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to close O_KA2");
+                        }
+                        break;
+                    }
+                    default: {
+                        return build_error_reply(msg_id, API_ERR_GPIO_VALUE_OUT_OF_RANGE, "Unknown value to set O_KA2");
+                    }
+                }
+                break;
+            }
+
+            default: {
+                break;
+            }
+        }
+        arr_len--;
+    } while ((jobj_i = json_getNext(jobj_i)) != NULL && (jobj_v = json_getNext(jobj_v)) != NULL);
+
+    if (arr_len != 0) {
+        log_warn("ERROR: incomplete set/out (arr_len: %d)", arr_len);
+    }
+
+    build_set_out_reply(msg_id);
+}
+
 
 static void query_exec(char *msg_id, char *topic, json_object *jobj_payload) {
     // get/all
     if (strcasecmp(topic, "get/all") == 0) {
         build_get_all_reply(msg_id);
+        return;
+    }
+    // set/out
+    if (strcasecmp(topic, "set/out") == 0) {
+        exec_set_out(msg_id, jobj_payload);
         return;
     }
     // Unknown topic

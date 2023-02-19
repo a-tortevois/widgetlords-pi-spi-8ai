@@ -51,7 +51,8 @@ wss.on('connection', (ws, req) => {
                     break;
                 }
 
-                case 'get/all': {
+                case 'get/all':
+                case 'set/out': {
                     socketClient.write(JSON.stringify(msg));
                     break;
                 }
