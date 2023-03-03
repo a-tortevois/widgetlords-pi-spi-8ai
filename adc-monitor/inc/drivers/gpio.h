@@ -45,7 +45,7 @@ typedef struct {
 
 int gpio_init(void);
 int gpio_id_is_available(int id);
-// int gpio_read(gpio_id id);
+int gpio_read(gpio_id id);
 int gpio_write(gpio_id id, io_state value);
 // bool gpio_get_is_reversed(gpio_id id);
 io_state gpio_get_value(gpio_id id);

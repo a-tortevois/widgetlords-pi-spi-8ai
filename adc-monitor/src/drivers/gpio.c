@@ -19,7 +19,7 @@ static int gpio_fd = -1;
 static const char gpio_adapter[] = "/dev/gpiochip0";
 
 static const char *L_IO_STATE[IO_STATE_COUNT] = {"Open", "Close"};
-// static const char *L_IO_EVENT[IO_EVENT_COUNT] = {"IO_EVENT_NONE", "IO_EVENT_RISING_EDGE", "IO_EVENT_FALLING_EDGE"};
+static const char *L_IO_EVENT[IO_EVENT_COUNT] = {"IO_EVENT_NONE", "IO_EVENT_RISING_EDGE", "IO_EVENT_FALLING_EDGE"};
 
 static gpio_struc GPIO[IO_COUNT] = {
     // O_KA1
@@ -27,16 +27,16 @@ static gpio_struc GPIO[IO_COUNT] = {
         .name = "O_KA1",
         .pin = 23,
         .type = OUT_TOR,
-        .is_reversed = false,
-        .init_state = IO_OPEN,
+        .is_reversed = true,
+        .init_state = IO_CLOSE,
     },
     // O_KA2
     {
         .name = "O_KA2",
         .pin = 24,
         .type = OUT_TOR,
-        .is_reversed = false,
-        .init_state = IO_OPEN
+        .is_reversed = true,
+        .init_state = IO_CLOSE
     },
 };
 
@@ -181,7 +181,6 @@ int gpio_id_is_available(int id) {
 }
 
 /** Read the state of Input or Output GPIO pin */
-/* Unused
 int gpio_read(gpio_id id) {
     int rc = 0;
 
@@ -218,7 +217,6 @@ int gpio_read(gpio_id id) {
 
     return rc;
 }
-*/
 
 /** Write on Output GPIO pin */
 int gpio_write(gpio_id id, io_state value) {

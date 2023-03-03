@@ -35,6 +35,10 @@ static void mainloop_exec() {
     for (adc_mcp3008_input_id id = 0; id < ADC_INPUTS_COUNT; id++) {
         adc_mcp3008_read(id);
     }
+
+    for (gpio_id id = 0; id < IO_COUNT; id++) {
+        gpio_read(id);
+    }
 }
 
 static int mainloop_clean() {

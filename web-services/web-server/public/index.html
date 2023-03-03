@@ -49,6 +49,7 @@
     }
 
     function sendSetOutMessage() {
+        let ioToReset = [];
         let msg = {
             topic: "set/out",
             payload: {
@@ -64,6 +65,9 @@
                     if (v !== contextData.io[i] && v >= IO[i].min_value && v <= IO[i].max_value) {
                         msg.payload.i.push(parseInt(i));
                         msg.payload.v.push(v);
+                        if (v === 1) {
+                            ioToReset.push(parseInt(i));
+                        }
                     }
                 }
             }
@@ -72,6 +76,48 @@
         if (msg.payload.i.length > 0) {
             ws.send(msg);
         }
+
+        if (ioToReset.length > 0) {
+            setTimeout(() => {
+                msg = {
+                    topic: "set/out",
+                    payload: {
+                        i: [],
+                        v: [],
+                    }
+                }
+                for (let i in ioToReset) {
+                    msg.payload.i.push(ioToReset[i]);
+                    msg.payload.v.push(0);
+                }
+                ws.send(msg);
+            }, 1_000);
+        }
+    }
+
+    function sendPulseOnKA(i) {
+        let msg = {
+            topic: "set/out",
+            payload: {
+                i: [i],
+                v: [1],
+            }
+        }
+        ws.send(msg);
+        setTimeout(() => {
+            /*
+            msg = {
+                topic: "set/out",
+                payload: {
+                    i: [i],
+                    v: [0],
+                }
+            }
+            */
+            msg.payload.v = [0];
+            ws.send(msg);
+        }, 1_000);
+
     }
 
     function getForm() {
@@ -90,6 +136,18 @@
             }
         }
         html += `<button onclick="sendSetOutMessage();">Save</button>`;
+        return html;
+    }
+
+
+    function getButtons() {
+        let html = ``;
+        for (let i in IO) {
+            if (IO.hasOwnProperty(i)) {
+                i = parseInt(i);
+                html += `<button onclick="sendPulseOnKA(${i});">Pulse on KA${i + 1}</button>`;
+            }
+        }
         return html;
     }
 
@@ -114,6 +172,13 @@
         // This callback is automatically executed when a value change is received on the WebSocket (see in websocket-client.js:_updateContextData)
         // Note: the `key` is always `adc` in this application
 
+        switch (key) {
+            case "io": {
+                setElementValue(`${IO[id].name}`, value);
+                setElementValue(`${IO[id].name}_value`, value);
+            }
+        }
+
         // Below is a use case
         // if (index === getIndexFromAdcName('ADC_DEV_0_CHAN_0')) {
         //     if (contactIsClosed(value)) {
@@ -135,8 +200,11 @@
         // html += `<div class="flex-row">`;
         // html += getCells("io");
         // html += `</div>`;
+        // html += `<div>`;
+        // html += getForm();
+        // html += `</div>`;
         html += `<div>`;
-        html += getForm();
+        html += getButtons();
         html += `</div>`;
         html += `<div class="versions">`;
         html += `<div>Software version: ${getSwVersion()}</div>`;
