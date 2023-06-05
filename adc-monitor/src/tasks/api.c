@@ -411,50 +411,21 @@ static void exec_set_out(char *msg_id, json_object *jobj_payload) {
             return;
         }
 
-        switch (id) {
-            case O_KA1: {
-                switch (value) {
-                    case 0: {
-                        if (gpio_write(O_KA1, IO_OPEN) < 0) {
-                            return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to open O_KA1");
-                        }
-                        break;
-                    }
-                    case 1: {
-                        if (gpio_write(O_KA1, IO_CLOSE) < 0) {
-                            return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to close O_KA1");
-                        }
-                        break;
-                    }
-                    default: {
-                        return build_error_reply(msg_id, API_ERR_GPIO_VALUE_OUT_OF_RANGE, "Unknown value to set O_KA1");
-                    }
+        switch (value) {
+            case 0: {
+                if (gpio_write(id, IO_OPEN) < 0) {
+                    return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to open O_KA%d", id);
                 }
                 break;
             }
-            case O_KA2: {
-                switch (value) {
-                    case 0: {
-                        if (gpio_write(O_KA2, IO_OPEN) < 0) {
-                            return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to open O_KA2");
-                        }
-                        break;
-                    }
-                    case 1: {
-                        if (gpio_write(O_KA2, IO_CLOSE) < 0) {
-                            return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to close O_KA2");
-                        }
-                        break;
-                    }
-                    default: {
-                        return build_error_reply(msg_id, API_ERR_GPIO_VALUE_OUT_OF_RANGE, "Unknown value to set O_KA2");
-                    }
+            case 1: {
+                if (gpio_write(id, IO_CLOSE) < 0) {
+                    return build_error_reply(msg_id, API_ERR_GPIO_UNABLE_TO_SET_VALUE, "Unable to close O_KA%d", id);
                 }
                 break;
             }
-
             default: {
-                break;
+                return build_error_reply(msg_id, API_ERR_GPIO_VALUE_OUT_OF_RANGE, "Unknown value to set O_KA%d", id);
             }
         }
         arr_len--;

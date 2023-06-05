@@ -28,6 +28,12 @@ typedef enum {
 typedef enum {
     O_KA1,
     O_KA2,
+    O_KA3,
+    O_KA4,
+    O_KA5,
+    O_KA6,
+    O_KA7,
+    O_KA8,
     IO_COUNT
 } gpio_id;
 

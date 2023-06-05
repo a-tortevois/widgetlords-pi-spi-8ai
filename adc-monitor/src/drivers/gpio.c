@@ -38,6 +38,54 @@ static gpio_struc GPIO[IO_COUNT] = {
         .is_reversed = true,
         .init_state = IO_CLOSE
     },
+    // O_KA3
+    {
+        .name = "O_KA3",
+        .pin = 5,
+        .type = OUT_TOR,
+        .is_reversed = true,
+        .init_state = IO_CLOSE
+    },
+    // O_KA4
+    {
+        .name = "O_KA4",
+        .pin = 6,
+        .type = OUT_TOR,
+        .is_reversed = true,
+        .init_state = IO_CLOSE
+    },
+    // O_KA5
+    {
+        .name = "O_KA5",
+        .pin = 26,
+        .type = OUT_TOR,
+        .is_reversed = true,
+        .init_state = IO_CLOSE
+    },
+    // O_KA6
+    {
+        .name = "O_KA6",
+        .pin = 16,
+        .type = OUT_TOR,
+        .is_reversed = true,
+        .init_state = IO_CLOSE
+    },
+    // O_KA7
+    {
+        .name = "O_KA7",
+        .pin = 20,
+        .type = OUT_TOR,
+        .is_reversed = true,
+        .init_state = IO_CLOSE
+    },
+    // O_KA8
+    {
+        .name = "O_KA8",
+        .pin = 21,
+        .type = OUT_TOR,
+        .is_reversed = true,
+        .init_state = IO_CLOSE
+    },
 };
 
 // -- Private functions ---------------------------------------------------------------------

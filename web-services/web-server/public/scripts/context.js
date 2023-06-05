@@ -144,6 +144,48 @@ const IO = [
         min_value: 0,
         max_value: 1,
     },
+    // O_KA3
+    {
+        name: 'O_KA3',
+        type: 'range',
+        min_value: 0,
+        max_value: 1,
+    },
+    // O_KA4
+    {
+        name: 'O_KA4',
+        type: 'range',
+        min_value: 0,
+        max_value: 1,
+    },
+    // O_KA5
+    {
+        name: 'O_KA5',
+        type: 'range',
+        min_value: 0,
+        max_value: 1,
+    },
+    // O_KA6
+    {
+        name: 'O_KA6',
+        type: 'range',
+        min_value: 0,
+        max_value: 1,
+    },
+    // O_KA7
+    {
+        name: 'O_KA7',
+        type: 'range',
+        min_value: 0,
+        max_value: 1,
+    },
+    // O_KA8
+    {
+        name: 'O_KA8',
+        type: 'range',
+        min_value: 0,
+        max_value: 1,
+    },
 ];
 
 const loadContextData = () => {
